@@ -15,54 +15,39 @@ class ElasticSearchController
         $this->elasticSearch = ClientBuilder::create()->build();
     }
 
-    public function addDocument()
+    /**
+     * @param array $params
+     * @return array|callable
+     */
+    public function addDocument(array $params)
     {
-        $params = [
-            'index' => 'my_index',
-            'id' => 'my_id',
-            'body' => ['testField' => 'abc']
-        ];
-
-        $response = $this->elasticSearch->index($params);
-        print_r($response);
+        return $this->elasticSearch->index($params);
     }
 
-    public function getDocument()
+    /**
+     * @param array $params
+     * @return array|callable
+     */
+    public function getDocument(array $params)
     {
-        $params = [
-            'index' => 'my_index',
-            'id'    => 'my_id'
-        ];
-
-        $response = $this->elasticSearch->get($params);
-        print_r($response);
+        return $this->elasticSearch->get($params);
     }
 
-    public function searchDocument()
+    /**
+     * @param array $params
+     * @return array|callable
+     */
+    public function searchDocument(array $params)
     {
-        $params = [
-            'index' => 'my_index',
-            'body'  => [
-                'query' => [
-                    'match' => [
-                        'testField' => 'abc'
-                    ]
-                ]
-            ]
-        ];
-
-        $response = $this->elasticSearch->search($params);
-        print_r($response);
+        return $this->elasticSearch->search($params);
     }
 
-    public function deleteDocument()
+    /**
+     * @param array $params
+     * @return array|callable
+     */
+    public function deleteDocument(array $params)
     {
-        $params = [
-            'index' => 'my_index',
-            'id'    => 'my_id'
-        ];
-
-        $response = $this->elasticSearch->delete($params);
-        print_r($response);
+        return $this->elasticSearch->delete($params);
     }
 }

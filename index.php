@@ -12,4 +12,3 @@ $dotenv = Dotenv\Dotenv::createImmutable($_SERVER['PWD']);
 $dotenv->load();
 
 $run = new ElasticSearchController();
-$run->addDocument();
