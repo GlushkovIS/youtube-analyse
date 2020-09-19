@@ -51,10 +51,4 @@ class ElasticSearchController
         return $this->elasticSearch->delete($params);
     }
 
-    public function getNumberDocInIndex(string $index)
-    {
-        return $this->elasticSearch->count([
-            'index' => $index
-        ]);
-    }
 }
