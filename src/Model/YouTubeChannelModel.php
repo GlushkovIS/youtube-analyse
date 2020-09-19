@@ -3,7 +3,6 @@
 
 namespace Model;
 
-
 use Controllers\ElasticSearchController;
 
 class YouTubeChannelModel
