@@ -1,9 +1,8 @@
 {
-  "index": "youtubeChannel",
-  "id": "1",
+  "index": "youtube",
+  "id": "name",
   "body": {
-    "name": "",
-    "views": "",
-    "countVideo": ""
+    "views": "100000000",
+    "countVideo": "1000"
   }
 }

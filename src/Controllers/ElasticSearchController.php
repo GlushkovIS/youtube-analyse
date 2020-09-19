@@ -2,17 +2,17 @@
 
 namespace Controllers;
 
-use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 
 class ElasticSearchController
 {
-    /** @var Client */
-    public Client $elasticSearch;
+    public $elasticSearch;
+    public $host;
 
     public function __construct()
     {
-        $this->elasticSearch = ClientBuilder::create()->build();
+        $this->host = $_ENV['ES_HOST'];
+        $this->elasticSearch = ClientBuilder::create()->setHosts([$this->host])->build();
     }
 
     /**

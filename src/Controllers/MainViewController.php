@@ -1,22 +1,24 @@
 <?php
 
-require_once 'bootstrap/app.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/bootstrap/app.php';
 
 use Controllers\MainController;
+use Exceptions\RestClientException;
+use Handlers\MainViewHandler;
 
-$mainController = new MainController();
-$dotenv = Dotenv\Dotenv::createImmutable($_SERVER['PWD']);
-
-$dotenv->required('YOUTUBE_API_KEY');
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable($_SERVER['DOCUMENT_ROOT']);
 $dotenv->load();
 
-if (isset($_POST['nameChannel'])) {
-    $nameChannel = htmlspecialchars($_POST['nameChannel']);
+$mainController = new MainController();
+
+if (isset($_POST['name'])) {
+    $name = MainViewHandler::validateInputData($_POST['name']);
     try {
-        $mainController->getYoutubeDataAndSave($nameChannel);
-    } catch (\Exceptions\RestClientException $e) {
+        $result = $mainController->writeYoutubeData($name);
+    } catch (RestClientException $e) {
     }
 }
 
-echo '<pre>';
-echo $mainController->showAllYoutubeChannelsStat();
+if (isset($_POST['show'])) {
+    MainViewHandler::displayData($mainController);
+}

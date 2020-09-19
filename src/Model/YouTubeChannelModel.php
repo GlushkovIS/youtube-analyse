@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Model;
 
 use Controllers\ElasticSearchController;
@@ -8,16 +7,16 @@ use Controllers\ElasticSearchController;
 class YouTubeChannelModel
 {
     /** @var string имя канала */
-    protected string $name;
+    protected $name;
     /** @var string общее число просмотров */
-    protected string $views;
+    protected $views;
     /** @var int всего загружено видео */
-    protected int $countVideo;
+    protected $countVideo;
 
-    public function saveToES()
+    public function save()
     {
         return (new ElasticSearchController())->addDocument([
-            'index' => 'youtubeChannel',
+            'index' => 'youtube',
             'id' => $this->name,
             'body' => ['views' => $this->views, 'countVideo' => $this->countVideo]
         ]);
@@ -76,6 +75,4 @@ class YouTubeChannelModel
         $this->countVideo = $countVideo;
         return $this;
     }
-
-
 }

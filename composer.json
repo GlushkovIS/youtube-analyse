@@ -11,9 +11,10 @@
   ],
   "require": {
     "elasticsearch/elasticsearch": "7.9.0",
-    "php": ">=7.4",
+    "php": ">=7.2",
     "vlucas/phpdotenv": "5.2",
-    "ext-curl": "7.4.2"
+    "ext-curl": "7.3.11",
+    "ext-iconv": "*"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "3.5.6"

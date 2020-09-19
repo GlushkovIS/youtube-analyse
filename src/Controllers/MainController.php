@@ -6,7 +6,7 @@ use Exceptions\RestClientException;
 
 class MainController
 {
-    protected ElasticSearchController $es;
+    protected $es;
 
     public function __construct()
     {
@@ -14,22 +14,25 @@ class MainController
     }
 
 
-    public function showAllYoutubeChannelsStat()
+    public function getSaveYoutubeData()
     {
-        return $this->es->getDocument([
-            'index' => 'youtubeChannel'
+        return $this->es->searchDocument([
+            'index' => 'youtube'
         ]);
     }
 
     /**
      * @param string $nameChannel
+     * @return bool
      * @throws RestClientException
      */
-    public function getYoutubeDataAndSave(string $nameChannel): void
+    public function writeYoutubeData(string $nameChannel)
     {
-        $youtubeChannelModel = (new YouTubeAPIController())->getYoutubeChannelData($nameChannel);
-        if ($youtubeChannelModel !== null) {
-            $youtubeChannelModel->saveToES();
+        $youtubeChannelModel = (new YouTubeAPIController())->getData($nameChannel);
+        if ($youtubeChannelModel !== false) {
+            $youtubeChannelModel->save();
+            return true;
         }
+        return false;
     }
 }

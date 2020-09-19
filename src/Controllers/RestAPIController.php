@@ -8,19 +8,17 @@ use Iterator;
 
 class RestAPIController implements Iterator, ArrayAccess
 {
-
     public $options;
-    public $handle; // cURL resource handle.
+    public $handle;
 
-    // Populated after execution:
-    public $response; // Response body.
-    public $headers; // Parsed reponse header object.
-    public $info; // Response info object.
-    public $error; // Response error string.
-    public $response_status_lines; // indexed array of raw HTTP response status lines.
+    public $response;
+    public $headers;
+    public $info;
+    public $error;
+    public $response_status_lines;
 
-    // Populated as-needed.
-    public $decoded_response; // Decoded response body.
+    public $decoded_response;
+    private $url;
 
     public function __construct($options = [])
     {
@@ -50,26 +48,35 @@ class RestAPIController implements Iterator, ArrayAccess
         }
     }
 
-    public function set_option($key, $value)
+    public function setOption($key, $value)
     {
         $this->options[$key] = $value;
     }
 
-    public function register_decoder($format, $method)
+    /**
+     * @param $format
+     * @param $method
+     */
+    public function registerDecoder($format, $method)
     {
-        // Decoder callbacks must adhere to the following pattern:
-        //   array my_decoder(string $data)
         $this->options['decoders'][$format] = $method;
     }
 
-    // Iterable methods:
+    /**
+     * @return mixed|void
+     * @throws RestClientException
+     */
     public function rewind()
     {
-        $this->decode_response();
+        $this->decodeResponse();
         return reset($this->decoded_response);
     }
 
-    public function decode_response()
+    /**
+     * @return mixed
+     * @throws RestClientException
+     */
+    public function decodeResponse()
     {
         if (empty($this->decoded_response)) {
             $format = $this->get_response_format();
@@ -87,6 +94,10 @@ class RestAPIController implements Iterator, ArrayAccess
         return $this->decoded_response;
     }
 
+    /**
+     * @return mixed
+     * @throws RestClientException
+     */
     public function get_response_format()
     {
         if (!$this->response) {
@@ -95,12 +106,10 @@ class RestAPIController implements Iterator, ArrayAccess
             );
         }
 
-        // User-defined format.
         if (!empty($this->options['format'])) {
             return $this->options['format'];
         }
 
-        // Extract format from response content-type header.
         if (!empty($this->headers->content_type)) {
             if (preg_match($this->options['format_regex'], $this->headers->content_type, $matches)) {
                 return $matches[2];
@@ -122,8 +131,6 @@ class RestAPIController implements Iterator, ArrayAccess
         return key($this->decoded_response);
     }
 
-    // ArrayAccess methods:
-
     public function next()
     {
         return next($this->decoded_response);
@@ -135,9 +142,14 @@ class RestAPIController implements Iterator, ArrayAccess
             && (key($this->decoded_response) !== null);
     }
 
+    /**
+     * @param mixed $key
+     * @return mixed|null
+     * @throws RestClientException
+     */
     public function offsetGet($key)
     {
-        $this->decode_response();
+        $this->decodeResponse();
         if (!$this->offsetExists($key)) {
             return null;
         }
@@ -146,20 +158,32 @@ class RestAPIController implements Iterator, ArrayAccess
             $this->decoded_response[$key] : $this->decoded_response->{$key};
     }
 
+    /**
+     * @param mixed $key
+     * @return bool
+     * @throws RestClientException
+     */
     public function offsetExists($key)
     {
-        $this->decode_response();
+        $this->decodeResponse();
         return is_array($this->decoded_response) ?
             isset($this->decoded_response[$key]) : isset($this->decoded_response->{$key});
     }
 
-    // Request methods:
-
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     * @throws RestClientException
+     */
     public function offsetSet($key, $value)
     {
         throw new RestClientException("Decoded response data is immutable.");
     }
 
+    /**
+     * @param mixed $key
+     * @throws RestClientException
+     */
     public function offsetUnset($key)
     {
         throw new RestClientException("Decoded response data is immutable.");
@@ -251,7 +275,7 @@ class RestAPIController implements Iterator, ArrayAccess
         }
         curl_setopt_array($client->handle, $curlopt);
 
-        $client->parse_response(curl_exec($client->handle));
+        $client->parseResponse(curl_exec($client->handle));
         $client->info = (object)curl_getinfo($client->handle);
         $client->error = curl_error($client->handle);
 
@@ -259,7 +283,7 @@ class RestAPIController implements Iterator, ArrayAccess
         return $client;
     }
 
-    public function parse_response($response)
+    public function parseResponse($response)
     {
         $headers = [];
         $this->response_status_lines = [];

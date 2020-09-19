@@ -7,8 +7,8 @@ use Model\YouTubeChannelModel;
 
 class YouTubeAPIController
 {
-    protected RestAPIController $youtubeAPI;
-    private string $apiKey;
+    protected $youtubeAPI;
+    private $apiKey;
 
     public function __construct()
     {
@@ -20,10 +20,10 @@ class YouTubeAPIController
 
     /**
      * @param string $channelName
-     * @return YouTubeChannelModel|null
+     * @return false|YouTubeChannelModel
      * @throws RestClientException
      */
-    public function getYoutubeChannelData(string $channelName): ?YouTubeChannelModel
+    public function getData(string $channelName)
     {
         $result = $this->youtubeAPI->get('channels', [
             'part' => 'statistics',
@@ -32,13 +32,14 @@ class YouTubeAPIController
         ]);
 
         if ($result->info->http_code == 200) {
-            $resultObj = $result->decode_response();
-            $resultObj->items[0]->statistics->viewCount;
-
-            return (new YouTubeChannelModel())
-                ->setName($channelName)
-                ->setViews($resultObj->items[0]->statistics->viewCount)
-                ->setCountVideo($resultObj->items[0]->statistics->videoCount);
+            $resultObj = $result->decodeResponse();
+            if ($resultObj->pageInfo->totalResults !== 0) {
+                return (new YouTubeChannelModel())
+                    ->setName($channelName)
+                    ->setViews($resultObj->items[0]->statistics->viewCount)
+                    ->setCountVideo($resultObj->items[0]->statistics->videoCount);
+            }
         }
+        return false;
     }
 }
